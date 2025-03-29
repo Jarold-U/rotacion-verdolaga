@@ -14,25 +14,24 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Control de sesión con variable persistente
+# Autenticación con control de sesión
 if 'autenticado' not in st.session_state:
     st.session_state.autenticado = False
 
-# Paso 1: Validar contraseña
 if not st.session_state.autenticado:
     with st.expander("🔐 Ingresar contraseña", expanded=True):
         password = st.text_input("Contraseña", type="password")
         if password == PASSWORD:
-            st.success("✅ Contraseña correcta. Bienvenido.")
             st.session_state.autenticado = True
-            st.experimental_rerun()
+            st.success("✅ Contraseña correcta. Bienvenido.")
         elif password != "":
             st.error("❌ Contraseña incorrecta")
     st.stop()
 
+# Mensaje de bienvenida
 st.success("🎉 ¡Bienvenido al Sistema de Rotación Verdolaga!")
 
-# Función para cargar archivos
+# Función para cargar archivos Excel o CSV
 def cargar_archivo_seguro(file):
     try:
         if file.name.endswith('.csv'):
@@ -43,7 +42,7 @@ def cargar_archivo_seguro(file):
         st.error(f"Error al leer el archivo: {e}")
         return None
 
-# Paso 2: Cargar archivos
+# Carga de archivos
 with st.expander("📁 1. Carga los archivos de los partidos", expanded=True):
     archivo_actual = st.file_uploader("📥 Archivo del partido actual", type=["csv", "xlsx"], key="actual")
     archivo_anterior = st.file_uploader("📥 Archivo del partido anterior", type=["csv", "xlsx"], key="anterior")
@@ -62,7 +61,7 @@ if archivo_actual and archivo_anterior:
                 st.error(f"Falta la columna '{col}' en el archivo anterior.")
                 st.stop()
 
-        # Paso 3: Configurar cantidad por tribuna
+        # Configuración de cantidad por tribuna
         with st.expander("🎯 2. Define la cantidad por tribuna", expanded=True):
             tribunas = df_actual['TRIBUNA'].dropna().unique()
             tribuna_config = {}
@@ -70,7 +69,7 @@ if archivo_actual and archivo_anterior:
                 cantidad = st.number_input(f"Cantidad para tribuna {tribuna}", min_value=0, step=1)
                 tribuna_config[tribuna] = cantidad
 
-        # Paso 4: Generar rotación
+        # Generar rotación
         with st.expander("🎲 3. Generar rotación", expanded=True):
             if st.button("🚀 Generar ahora", use_container_width=True):
                 df_actual['CLASIFICACION'] = 'ROTAR'

@@ -14,22 +14,21 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Control de sesión para autenticación
-if 'autenticado' not in st.session_state:
-    st.session_state.autenticado = False
+# Validación con query params para recargar la app y mostrar el resto
+query_params = st.experimental_get_query_params()
+acceso_ok = query_params.get("acceso", [""])[0] == "ok"
 
-# Paso 1: Contraseña
-if not st.session_state.autenticado:
+if not acceso_ok:
     with st.expander("🔐 Ingresar contraseña", expanded=True):
         password = st.text_input("Contraseña", type="password")
         if password == PASSWORD:
-            st.success("✅ Contraseña correcta")
-            st.session_state.autenticado = True
+            st.success("✅ Contraseña correcta. Cargando sistema...")
+            st.experimental_set_query_params(acceso="ok")
+            st.stop()
         elif password != "":
             st.error("❌ Contraseña incorrecta")
     st.stop()
 
-# Mensaje de bienvenida
 st.success("🎉 ¡Bienvenido al Sistema de Rotación Verdolaga!")
 
 # Función para cargar archivos

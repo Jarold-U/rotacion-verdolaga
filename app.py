@@ -15,7 +15,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Validación con query params para recargar la app y mostrar el resto
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 acceso_ok = query_params.get("acceso", [""])[0] == "ok"
 
 if not acceso_ok:

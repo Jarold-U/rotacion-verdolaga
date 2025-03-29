@@ -3,6 +3,9 @@ import pandas as pd
 import io
 import random
 
+from streamlit.runtime.scriptrunner import RerunException
+from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
+
 PASSWORD = "Verd0laga2025!"
 st.set_page_config(page_title="Sistema de Rotación Verdolaga", layout="centered")
 
@@ -23,7 +26,7 @@ if not st.session_state.autenticado:
         password = st.text_input("Contraseña", type="password")
         if password == PASSWORD:
             st.session_state.autenticado = True
-            st.experimental_rerun()
+            raise RerunException(get_script_run_ctx())
         elif password != "":
             st.error("❌ Contraseña incorrecta.")
     st.stop()
@@ -100,4 +103,3 @@ if archivo_actual and archivo_anterior:
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                     df_final.to_excel(writer, index=False, sheet_name='Rotacion')
                 st.download_button("📥 Descargar archivo rotado", data=output.getvalue(), file_name="rotacion_verdolaga.xlsx", use_container_width=True)
-

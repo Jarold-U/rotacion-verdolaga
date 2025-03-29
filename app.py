@@ -3,12 +3,10 @@ import pandas as pd
 import io
 import random
 
-from streamlit.runtime.scriptrunner import RerunException
-from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
-
 PASSWORD = "Verd0laga2025!"
 st.set_page_config(page_title="Sistema de Rotación Verdolaga", layout="centered")
 
+# Logo y título
 st.markdown("""
     <div style='text-align: center;'>
         <img src='https://dimayor.com.co/wp-content/uploads/2024/06/Atletico-nacional.png' width='130'>
@@ -16,20 +14,23 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Control de sesión
+# Control de sesión para autenticación
 if 'autenticado' not in st.session_state:
     st.session_state.autenticado = False
 
-# Paso 1: Validación de contraseña
+# Paso 1: Contraseña
 if not st.session_state.autenticado:
     with st.expander("🔐 Ingresar contraseña", expanded=True):
         password = st.text_input("Contraseña", type="password")
         if password == PASSWORD:
+            st.success("✅ Contraseña correcta")
             st.session_state.autenticado = True
-            raise RerunException(get_script_run_ctx())
         elif password != "":
-            st.error("❌ Contraseña incorrecta.")
+            st.error("❌ Contraseña incorrecta")
     st.stop()
+
+# Mensaje de bienvenida
+st.success("🎉 ¡Bienvenido al Sistema de Rotación Verdolaga!")
 
 # Función para cargar archivos
 def cargar_archivo_seguro(file):
@@ -61,6 +62,7 @@ if archivo_actual and archivo_anterior:
                 st.error(f"Falta la columna '{col}' en el archivo anterior.")
                 st.stop()
 
+        # Paso 3: Configurar cantidad por tribuna
         with st.expander("🎯 2. Define la cantidad por tribuna", expanded=True):
             tribunas = df_actual['TRIBUNA'].dropna().unique()
             tribuna_config = {}
@@ -68,6 +70,7 @@ if archivo_actual and archivo_anterior:
                 cantidad = st.number_input(f"Cantidad para tribuna {tribuna}", min_value=0, step=1)
                 tribuna_config[tribuna] = cantidad
 
+        # Paso 4: Generar rotación
         with st.expander("🎲 3. Generar rotación", expanded=True):
             if st.button("🚀 Generar ahora", use_container_width=True):
                 df_actual['CLASIFICACION'] = 'ROTAR'
@@ -96,7 +99,7 @@ if archivo_actual and archivo_anterior:
                 ])
 
                 df_final = df_final.drop(columns=['TRIBUNA_ANTERIOR', 'CLASIFICACION'])
-                st.success("🎉 Rotación generada con éxito")
+                st.success("✅ Rotación generada con éxito")
                 st.dataframe(df_final)
 
                 output = io.BytesIO()

@@ -3,19 +3,17 @@ import pandas as pd
 import io
 import random
 
-# Seguridad básica
 PASSWORD = "Verd0laga2025!"
 st.set_page_config(page_title="Sistema de Rotación Verdolaga", layout="centered")
 
-# Encabezado con logo
-st.markdown("""
+st.markdown(\"\"\"
     <div style='text-align: center;'>
-        <img src='https://dimayor.com.co/wp-content/uploads/2024/06/Atletico-nacional.png' width='130'>
+        <img src='https://atlnacional.com.co/wp-content/uploads/2021/05/Solo-escudo.png' width='130'>
         <h1 style='color:#008D52;'>Sistema de Rotación Verdolaga</h1>
     </div>
-""", unsafe_allow_html=True)
+\"\"\", unsafe_allow_html=True)
 
-# Sesión para ocultar contraseña después de ingreso
+# Seguridad: validar antes de ejecutar cualquier parte pesada
 if 'autenticado' not in st.session_state:
     st.session_state.autenticado = False
 
@@ -29,11 +27,7 @@ if not st.session_state.autenticado:
             st.error("❌ Contraseña incorrecta.")
     st.stop()
 
-# Carga de archivos
-with st.expander("📁 1. Carga los archivos de los partidos", expanded=True):
-    archivo_actual = st.file_uploader("📥 Archivo del partido actual", type=["csv", "xlsx"], key="actual")
-    archivo_anterior = st.file_uploader("📥 Archivo del partido anterior", type=["csv", "xlsx"], key="anterior")
-
+# Función para cargar archivos
 def cargar_archivo_seguro(file):
     try:
         if file.name.endswith('.csv'):
@@ -44,6 +38,12 @@ def cargar_archivo_seguro(file):
         st.error(f"Error al leer el archivo: {e}")
         return None
 
+# Paso 1: Cargar archivos
+with st.expander("📁 1. Carga los archivos de los partidos", expanded=True):
+    archivo_actual = st.file_uploader("📥 Archivo del partido actual", type=["csv", "xlsx"], key="actual")
+    archivo_anterior = st.file_uploader("📥 Archivo del partido anterior", type=["csv", "xlsx"], key="anterior")
+
+# Si ambos archivos se cargan correctamente
 if archivo_actual and archivo_anterior:
     df_actual = cargar_archivo_seguro(archivo_actual)
     df_anterior = cargar_archivo_seguro(archivo_anterior)
@@ -58,6 +58,7 @@ if archivo_actual and archivo_anterior:
                 st.error(f"Falta la columna '{col}' en el archivo anterior.")
                 st.stop()
 
+        # Paso 2: Configurar tribunas
         with st.expander("🎯 2. Define la cantidad por tribuna", expanded=True):
             tribunas = df_actual['TRIBUNA'].dropna().unique()
             tribuna_config = {}
@@ -65,6 +66,7 @@ if archivo_actual and archivo_anterior:
                 cantidad = st.number_input(f"Cantidad para tribuna {tribuna}", min_value=0, step=1)
                 tribuna_config[tribuna] = cantidad
 
+        # Paso 3: Generar rotación
         with st.expander("🎲 3. Generar rotación", expanded=True):
             if st.button("🚀 Generar ahora", use_container_width=True):
                 df_actual['CLASIFICACION'] = 'ROTAR'

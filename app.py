@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import io
@@ -6,7 +7,7 @@ import random
 PASSWORD = "Verd0laga2025!"
 st.set_page_config(page_title="Sistema de Rotación Verdolaga", layout="centered")
 
-# Logo y título
+# Logo
 st.markdown("""
     <div style='text-align: center;'>
         <img src='https://dimayor.com.co/wp-content/uploads/2024/06/Atletico-nacional.png' width='130'>
@@ -14,24 +15,38 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Autenticación con control de sesión
+# Estado de sesión
 if 'autenticado' not in st.session_state:
     st.session_state.autenticado = False
 
+# Función para cerrar sesión
+def cerrar_sesion():
+    st.session_state.autenticado = False
+    st.experimental_rerun()
+
+# Vista de login
 if not st.session_state.autenticado:
-    with st.expander("🔐 Ingresar contraseña", expanded=True):
-        password = st.text_input("Contraseña", type="password")
-        if password == PASSWORD:
-            st.session_state.autenticado = True
-            st.success("✅ Contraseña correcta. Bienvenido.")
-        elif password != "":
-            st.error("❌ Contraseña incorrecta")
+    with st.form("login_form", clear_on_submit=True):
+        password = st.text_input("🔐 Ingresar contraseña", type="password")
+        submitted = st.form_submit_button("Ingresar")
+        if submitted:
+            if password == PASSWORD:
+                st.session_state.autenticado = True
+                st.success("✅ Contraseña correcta. Bienvenido.")
+                st.experimental_rerun()
+            else:
+                st.error("❌ Contraseña incorrecta")
     st.stop()
 
-# Mensaje de bienvenida
+# Botón de logout
+st.markdown("<div style='text-align: right;'>", unsafe_allow_html=True)
+if st.button("🔓 Cerrar sesión"):
+    cerrar_sesion()
+st.markdown("</div>", unsafe_allow_html=True)
+
 st.success("🎉 ¡Bienvenido al Sistema de Rotación Verdolaga!")
 
-# Función para cargar archivos Excel o CSV
+# Función para cargar archivos
 def cargar_archivo_seguro(file):
     try:
         if file.name.endswith('.csv'):
@@ -42,7 +57,7 @@ def cargar_archivo_seguro(file):
         st.error(f"Error al leer el archivo: {e}")
         return None
 
-# Carga de archivos
+# Paso 1: Cargar archivos
 with st.expander("📁 1. Carga los archivos de los partidos", expanded=True):
     archivo_actual = st.file_uploader("📥 Archivo del partido actual", type=["csv", "xlsx"], key="actual")
     archivo_anterior = st.file_uploader("📥 Archivo del partido anterior", type=["csv", "xlsx"], key="anterior")
@@ -61,7 +76,7 @@ if archivo_actual and archivo_anterior:
                 st.error(f"Falta la columna '{col}' en el archivo anterior.")
                 st.stop()
 
-        # Configuración de cantidad por tribuna
+        # Paso 2: Configurar cantidad por tribuna
         with st.expander("🎯 2. Define la cantidad por tribuna", expanded=True):
             tribunas = df_actual['TRIBUNA'].dropna().unique()
             tribuna_config = {}
@@ -69,7 +84,7 @@ if archivo_actual and archivo_anterior:
                 cantidad = st.number_input(f"Cantidad para tribuna {tribuna}", min_value=0, step=1)
                 tribuna_config[tribuna] = cantidad
 
-        # Generar rotación
+        # Paso 3: Generar rotación
         with st.expander("🎲 3. Generar rotación", expanded=True):
             if st.button("🚀 Generar ahora", use_container_width=True):
                 df_actual['CLASIFICACION'] = 'ROTAR'

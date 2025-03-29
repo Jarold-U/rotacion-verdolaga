@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import io
@@ -7,25 +6,35 @@ import random
 PASSWORD = "Verd0laga2025!"
 st.set_page_config(page_title="Sistema de Rotación Verdolaga", layout="centered")
 
-st.markdown("""
+st.markdown(\"\"\"
     <div style='text-align: center;'>
         <img src='https://dimayor.com.co/wp-content/uploads/2024/06/Atletico-nacional.png' width='130'>
         <h1 style='color:#008D52;'>Sistema de Rotación Verdolaga</h1>
     </div>
-""", unsafe_allow_html=True)
+\"\"\", unsafe_allow_html=True)
 
-# Seguridad: validar antes de ejecutar cualquier parte pesada
+# Sesión para controlar ingreso
 if 'autenticado' not in st.session_state:
     st.session_state.autenticado = False
+if 'ingreso_confirmado' not in st.session_state:
+    st.session_state.ingreso_confirmado = False
 
+# Paso 1: Autenticación
 if not st.session_state.autenticado:
     with st.expander("🔐 Ingresar contraseña", expanded=True):
         password = st.text_input("Contraseña", type="password")
         if password == PASSWORD:
             st.session_state.autenticado = True
-            st.success("✅ Acceso concedido. ¡Bienvenido al sistema verdolaga!")
+            st.success("✅ Contraseña correcta")
         elif password != "":
-            st.error("❌ Contraseña incorrecta.")
+            st.error("❌ Contraseña incorrecta")
+    st.stop()
+
+# Paso 2: Confirmar ingreso al sistema
+if not st.session_state.ingreso_confirmado:
+    st.markdown("### 💡 Estás autenticado. Ahora podés ingresar al sistema.")
+    if st.button("🚀 Ingresar al sistema", use_container_width=True):
+        st.session_state.ingreso_confirmado = True
     st.stop()
 
 # Función para cargar archivos
@@ -39,12 +48,11 @@ def cargar_archivo_seguro(file):
         st.error(f"Error al leer el archivo: {e}")
         return None
 
-# Paso 1: Cargar archivos
+# Paso 3: Cargar archivos
 with st.expander("📁 1. Carga los archivos de los partidos", expanded=True):
     archivo_actual = st.file_uploader("📥 Archivo del partido actual", type=["csv", "xlsx"], key="actual")
     archivo_anterior = st.file_uploader("📥 Archivo del partido anterior", type=["csv", "xlsx"], key="anterior")
 
-# Si ambos archivos se cargan correctamente
 if archivo_actual and archivo_anterior:
     df_actual = cargar_archivo_seguro(archivo_actual)
     df_anterior = cargar_archivo_seguro(archivo_anterior)
@@ -59,7 +67,6 @@ if archivo_actual and archivo_anterior:
                 st.error(f"Falta la columna '{col}' en el archivo anterior.")
                 st.stop()
 
-        # Paso 2: Configurar tribunas
         with st.expander("🎯 2. Define la cantidad por tribuna", expanded=True):
             tribunas = df_actual['TRIBUNA'].dropna().unique()
             tribuna_config = {}
@@ -67,7 +74,6 @@ if archivo_actual and archivo_anterior:
                 cantidad = st.number_input(f"Cantidad para tribuna {tribuna}", min_value=0, step=1)
                 tribuna_config[tribuna] = cantidad
 
-        # Paso 3: Generar rotación
         with st.expander("🎲 3. Generar rotación", expanded=True):
             if st.button("🚀 Generar ahora", use_container_width=True):
                 df_actual['CLASIFICACION'] = 'ROTAR'

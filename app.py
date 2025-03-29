@@ -13,28 +13,19 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Sesión para controlar ingreso
+# Control de sesión
 if 'autenticado' not in st.session_state:
     st.session_state.autenticado = False
-if 'ingreso_confirmado' not in st.session_state:
-    st.session_state.ingreso_confirmado = False
 
-# Paso 1: Autenticación
+# Paso 1: Validación de contraseña
 if not st.session_state.autenticado:
     with st.expander("🔐 Ingresar contraseña", expanded=True):
         password = st.text_input("Contraseña", type="password")
         if password == PASSWORD:
             st.session_state.autenticado = True
-            st.success("✅ Contraseña correcta")
+            st.experimental_rerun()
         elif password != "":
-            st.error("❌ Contraseña incorrecta")
-    st.stop()
-
-# Paso 2: Confirmar ingreso al sistema
-if not st.session_state.ingreso_confirmado:
-    st.markdown("### 💡 Estás autenticado. Ahora podés ingresar al sistema.")
-    if st.button("🚀 Ingresar al sistema", use_container_width=True):
-        st.session_state.ingreso_confirmado = True
+            st.error("❌ Contraseña incorrecta.")
     st.stop()
 
 # Función para cargar archivos
@@ -48,7 +39,7 @@ def cargar_archivo_seguro(file):
         st.error(f"Error al leer el archivo: {e}")
         return None
 
-# Paso 3: Cargar archivos
+# Paso 2: Cargar archivos
 with st.expander("📁 1. Carga los archivos de los partidos", expanded=True):
     archivo_actual = st.file_uploader("📥 Archivo del partido actual", type=["csv", "xlsx"], key="actual")
     archivo_anterior = st.file_uploader("📥 Archivo del partido anterior", type=["csv", "xlsx"], key="anterior")

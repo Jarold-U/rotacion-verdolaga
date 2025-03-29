@@ -9,7 +9,7 @@ st.set_page_config(page_title="Sistema de Rotación Verdolaga", layout="centered
 
 st.markdown("""
     <div style='text-align: center;'>
-        <img src='https://atlnacional.com.co/wp-content/uploads/2024/04/Atletico_Nacional.png' width='130'>
+        <img src='https://dimayor.com.co/wp-content/uploads/2024/06/Atletico-nacional.png' width='130'>
         <h1 style='color:#008D52;'>Sistema de Rotación Verdolaga</h1>
     </div>
 """, unsafe_allow_html=True)

@@ -14,17 +14,18 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Validación con query params para recargar la app y mostrar el resto
-query_params = st.query_params
-acceso_ok = query_params.get("acceso", [""])[0] == "ok"
+# Control de sesión con variable persistente
+if 'autenticado' not in st.session_state:
+    st.session_state.autenticado = False
 
-if not acceso_ok:
+# Paso 1: Validar contraseña
+if not st.session_state.autenticado:
     with st.expander("🔐 Ingresar contraseña", expanded=True):
         password = st.text_input("Contraseña", type="password")
         if password == PASSWORD:
-            st.success("✅ Contraseña correcta. Cargando sistema...")
-            st.experimental_set_query_params(acceso="ok")
-            st.stop()
+            st.success("✅ Contraseña correcta. Bienvenido.")
+            st.session_state.autenticado = True
+            st.experimental_rerun()
         elif password != "":
             st.error("❌ Contraseña incorrecta")
     st.stop()

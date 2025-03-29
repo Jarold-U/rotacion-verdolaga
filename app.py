@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import io
@@ -6,12 +7,12 @@ import random
 PASSWORD = "Verd0laga2025!"
 st.set_page_config(page_title="Sistema de Rotación Verdolaga", layout="centered")
 
-st.markdown(\"\"\"
+st.markdown("""
     <div style='text-align: center;'>
         <img src='https://atlnacional.com.co/wp-content/uploads/2021/05/Solo-escudo.png' width='130'>
         <h1 style='color:#008D52;'>Sistema de Rotación Verdolaga</h1>
     </div>
-\"\"\", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Seguridad: validar antes de ejecutar cualquier parte pesada
 if 'autenticado' not in st.session_state:

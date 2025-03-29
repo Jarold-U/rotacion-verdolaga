@@ -100,3 +100,4 @@ if archivo_actual and archivo_anterior:
                 with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                     df_final.to_excel(writer, index=False, sheet_name='Rotacion')
                 st.download_button("📥 Descargar archivo rotado", data=output.getvalue(), file_name="rotacion_verdolaga.xlsx", use_container_width=True)
+
